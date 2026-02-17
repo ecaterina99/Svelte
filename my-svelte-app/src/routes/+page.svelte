@@ -4,6 +4,8 @@
     let src = '/1.jpg';
 
     import Nested from './Nested.svelte';
+    import PackageInfo from "./PackageInfo.svelte";
+    import Counter from './Counter.svelte';
 
     let string = `this string contains some <strong>HTML!!!</strong>`;
 
@@ -26,7 +28,44 @@
         numbers.pop();
     }
 
-    import Counter from './Counter.svelte';
+    const pkg = {
+        name: 'svelte',
+        version: 5,
+        description: 'blazing fast',
+        website: 'https://svelte.dev'
+    };
+
+    const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    let selected = $state(colors[0]);
+
+
+    import Thing from './Thing.svelte';
+
+    let things = $state([
+        { id: 1, name: 'apple' },
+        { id: 2, name: 'banana' },
+        { id: 3, name: 'carrot' },
+        { id: 4, name: 'doughnut' },
+        { id: 5, name: 'egg' }
+    ]);
+
+    function removeFirst() {
+        things.shift();
+    }
+
+    function rollDice() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(Math.floor(Math.random() * 6) + 1);
+            }, 2000);
+        });
+    }
+    let promise = $state();
+
+    function handleClick() {
+        promise = rollDice();
+    }
+
 </script>
 
 
@@ -45,6 +84,13 @@
     Clicked {count}
     {count === 1 ? 'time' : 'times'}
 </button>
+{#if count>10}
+    <p>{count} is greater than 10</p>
+    {:else if count<10 && count>0}
+    <p>{count} is less than 10</p>
+    {:else}
+    <p>{count} is less than 1</p>
+{/if}
 <p>{numbers.join(' + ')} = ...</p>
 
 <button onclick={addNumber}>
@@ -62,11 +108,89 @@
 <Counter />
 <Counter />
 
+<Nested answer={42} />
+<Nested answer={23} />
+
+<PackageInfo
+        {...pkg}
+/>
+
+<p>Pick a color</p>
+<div>
+    {#each colors as color,i}
+        <button
+                class:selected={selected===color}
+                style="background: {color}"
+            onclick={()=>selected=color}
+           >{i+1}</button>
+    {/each}
+
+</div>
+
+
+
+
+<!-- KEYED EACH BLOCK -->
+{#each things as thing (thing.id)}
+    <Thing name={thing.name} />
+{/each}
+<button onclick={removeFirst}>
+    Remove first thing
+</button>
+
+
+
+
+<button onclick={handleClick}>
+    Roll dice
+</button>
+
+{#await promise}
+    <p>Rolling...</p>
+{:then number}
+    <p>You rolled: {number}</p>
+{/await}
+
+
+
 <style>
     p{
         color: goldenrod;
         font-family: 'Comic Sans MS', cursive;
         font-size: 2em;
     }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        transition: color 0.2s;
+    }
+
+    div {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-gap: 5px;
+        max-width: 400px;
+    }
+
+    .selected {
+        border: 4px solid black;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--color, #fff);
+        transform: translate(-2px,-2px);
+        filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
+        transition: all 0.1s;
+        color: black;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .selected {
+        transform: none;
+        filter: none;
+        box-shadow: inset 3px 3px 4px rgba(0,0,0,0.2);
+    }
+
 </style>
 
