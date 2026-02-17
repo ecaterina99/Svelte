@@ -66,6 +66,19 @@
         promise = rollDice();
     }
 
+    let m = $state({ x: 0, y: 0 });
+
+    function  onpointermove(event) {
+        m = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+
+    import Stepper from './Stepper.svelte';
+    let value = $state(0);
+
 </script>
 
 
@@ -128,8 +141,6 @@
 </div>
 
 
-
-
 <!-- KEYED EACH BLOCK -->
 {#each things as thing (thing.id)}
     <Thing name={thing.name} />
@@ -139,8 +150,7 @@
 </button>
 
 
-
-
+<!--await promise-->
 <button onclick={handleClick}>
     Roll dice
 </button>
@@ -151,9 +161,36 @@
     <p>You rolled: {number}</p>
 {/await}
 
+<!--DOM event-->
+<div class="pointer"
+        onpointermove={(event) => {
+		m.x = event.clientX;
+		m.y = event.clientY;
+	}}
+>
+    The pointer is at {m.x} x {m.y}
+</div>
+
+<!--capturing-->
+<div onkeydowncapture={(e) => alert(`<div> ${e.key}`)} role="presentation">
+    <input onkeydowncapture={(e) => alert(`<input> ${e.key}`)} />
+</div>
+
+
+<p>The current value is {value}</p>
+
+<Stepper
+        increment={() => value += 1}
+        decrement={() => value -= 1}
+/>
+
+
 
 
 <style>
+    .pointer {
+        color: blue;
+    }
     p{
         color: goldenrod;
         font-family: 'Comic Sans MS', cursive;
