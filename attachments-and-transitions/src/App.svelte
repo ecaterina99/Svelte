@@ -18,7 +18,54 @@
         return tooltip.destroy;
     };
     }
+
+    import InputComponent from "./components/InputComponent.svelte";
+    import { fly } from 'svelte/transition';
+    let visible = $state(true);
+
+
+    import { fade } from 'svelte/transition';
+    import { elasticOut } from 'svelte/easing';
+
+    function spin(node, { duration }) {
+        return {
+            duration,
+            css: (t, u) => {
+                const eased = elasticOut(t);
+
+                return `
+					transform: scale(${eased}) rotate(${eased * 1080}deg);
+					color: hsl(
+						${Math.trunc(t * 360)},
+						${Math.min(100, 1000 * u)}%,
+						${Math.min(50, 500 * u)}%
+					);`
+            }
+        };
+    }
+
+    let vis = $state(false);
+
+    function typewriter(node, { speed = 1 }) {
+        const valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;
+
+        if (!valid) {
+            throw new Error(`This transition only works on elements with a single text node child`);
+        }
+
+        const text = node.textContent;
+        const duration = text.length / (speed * 0.01);
+
+        return {
+            duration,
+            tick: (t) => {
+                const i = Math.trunc(text.length * t);
+                node.textContent = text.slice(0, i);
+            }
+        };
+    }
 </script>
+
 
 
 <div class="container">
@@ -63,6 +110,44 @@
                     <input type="range" bind:value={size} min="1" max="50" />
                     large
                 </label>
+                <InputComponent/>
+                <label>
+                    <input type="checkbox" bind:checked={vis} />
+                    vis
+                </label>
+
+                {#if vis}
+                    <p transition:typewriter>
+                        The quick brown fox jumps over the lazy dog
+                    </p>
+                {/if}
+                <label>
+                    <input type="checkbox" bind:checked={visible} />
+                    visible
+                </label>
+
+                {#if visible}
+
+                    <p transition:fly={{ y: 200, duration: 2000 }}>
+                        Flies in and out
+                    </p>
+                {/if}
+
+                <label>
+                    <input type="checkbox" bind:checked={visible} />
+                    visible
+                </label>
+
+                {#if visible}
+                    <div
+                            class="centered"
+                            in:spin={{ duration: 8000 }}
+                            out:fade
+                    >
+                        <span>transitions!</span>
+                    </div>
+                {/if}
+
 
             </div>
         </div>
@@ -76,6 +161,19 @@
 </div>
 
 <style>
+    .centered {
+        position: absolute;
+        left: 50%;
+        top: 120%;
+        transform: translate(-50%, -50%);
+    }
+
+    span {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        font-size: 4em;
+    }
+
     .container {
         position: fixed;
         left: 0;
