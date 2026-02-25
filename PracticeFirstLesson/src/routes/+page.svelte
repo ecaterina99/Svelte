@@ -1,4 +1,5 @@
 <script lang="ts">
+
     let name: string;
     name = "Anna";
     let age: number;
