@@ -3,6 +3,7 @@
     name = "Anna";
     let age: number;
     age = 20;
+    let score: number;
 
     let names: string[];
     names = ['Ben', 'Maria', 'David'];
@@ -28,13 +29,18 @@
 
     console.log(persons);
 
-    let namesOnly = persons.map(n=>n.name);
+    let namesOnly = persons.map(n => n.name);
     console.log(namesOnly);
 
-    let activeUsers = persons.filter(n=>n.active);
+    let activeUsers = persons.filter(n => n.active);
     console.log(activeUsers);
 
 
 </script>
 <h1>Welcome to SvelteKit</h1>
 <p> My name is {name} , I'm {age} years old.</p>
+<ul>
+    {#each persons as person}
+        <li> Name: {person.name} - Score: {person.score} </li>
+    {/each}
+</ul>
